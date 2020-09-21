@@ -16,7 +16,14 @@ app.get("/customers", (req, res) => {
   });
 });
 
-app.get("/customer/create", (req, res) => {
+app.get("/customers/:custId", (req, res) => {
+  const custId = req.params.custId;
+  omise.customers.retrieve(custId, function (error, customer) {
+    res.send(customer);
+  });
+});
+
+app.get("/customers/create", (req, res) => {
   omise.customers.create(
     {
       description: "Estus shard",
@@ -28,12 +35,14 @@ app.get("/customer/create", (req, res) => {
   );
 });
 
-app.get("/customer/update", (req, res) => {
+app.get("/customers/update/:custId", (req, res) => {
+  const custId = req.params.custId;
+  console.log(custId);
   omise.customers.update(
-    "cust_test_5cv3e2dh65qrms4wwt0",
+    custId,
     {
-      email: "estus.shard.change@example.com",
-      description: "change customer cust_test_5cv3e2dh65qrms4wwt0",
+      description: "Estus shard",
+      email: "estus.shard@example.com",
     },
     function (error, customer) {
       res.send(customer);
@@ -41,7 +50,30 @@ app.get("/customer/update", (req, res) => {
   );
 });
 
-app.get("/customer/delete", (req, res) => {
+app.get("/customers/updatecard/:custId", (req, res) => {
+  const custId = req.params.custId;
+  omise.customers.update(
+    custId,
+    {
+      card: "card_test_5labi99pi7far5hegbd",
+    },
+    function (error, customer) {
+      res.send(customer);
+    }
+  );
+});
+
+app.get("/customers/addcard", (req, res) => {
+  omise.customers.retrieveCard(
+    "cust_test_5cv3e2dh65qrms4wwt0",
+    "card_test_5labd2wbxa6v9hdw2ug",
+    function (error, card) {
+      res.send(card);
+    }
+  );
+});
+
+app.get("/customers/delete", (req, res) => {
   omise.customers.destroy("cust_test_5cv3epdv8e8mshgzzjo", function (
     error,
     customer
@@ -50,24 +82,54 @@ app.get("/customer/delete", (req, res) => {
   });
 });
 
+app.get("/customers/addcard", (req, res) => {
+  omise.customers.retrieveCard(
+    "cust_test_5cv3e2dh65qrms4wwt0",
+    "card_test_5lab6g2nbxc9vqsgvxu",
+    function (error, card) {
+      res.send(card);
+    }
+  );
+});
+app.get("/customers/cards/:custId", (req, res) => {
+  const custId = req.params.custId;
+  omise.customers.listCards(custId, function (error, list) {
+    res.send(list);
+  });
+});
+
+app.get("/customers/createwithcard", (req, res) => {
+  omise.customers.create(
+    {
+      description: "John Doe (id: 30)",
+      email: "john.doe@example.com",
+      card: "tokn_test_5labd2wcevoqgpnrtmx",
+    },
+    function (error, customer) {
+      res.send(customer);
+    }
+  );
+});
+
 //#endregion section - customer
 
 //#region section - token
-app.get("/token/retrieve", (req, res) => {
-  omise.tokens.retrieve("tokn_test_5laasv3bkc4dpuedbb4", function (
-    error,
-    token
-  ) {
-    console.log(error);
+
+app.get("/token/create", (req, res) => {
+  omise.tokens.create({ card: cardBody }, function (statusCode, token) {
     res.send(token);
   });
 });
 
-app.get("/token/create", (req, res) => {
-  omise.tokens.create({ card: cardBody }, function (statusCode, response) {
-    res.send(response);
+app.get("/token/retrieve", (req, res) => {
+  omise.tokens.retrieve("tokn_test_5labjq8kavz56s5w6ox", function (
+    error,
+    token
+  ) {
+    res.send(token);
   });
 });
+
 //#region section - token
 
 //#endregion section - source
@@ -84,6 +146,20 @@ app.get("/sources", (req, res) => {
 });
 //#endregion section - source
 
+//#region section - charge
+app.get("/charge", (req, res) => {
+  omise.charges.create(
+    {
+      amount: "100000",
+      currency: "thb",
+      customer: "cust_test_5g0221fe8iwtayocgja",
+    },
+    function (error, charge) {
+      res.send(charge);
+    }
+  );
+});
+//#endregion section - charge
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
 });
